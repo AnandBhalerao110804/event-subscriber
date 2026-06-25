@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+.git/
+.gitignore
+data/
+.env
+.DS_Store
+ASSIGNMENT - SDE.md

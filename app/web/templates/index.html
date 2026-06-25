@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Webhook Service{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+<p class="muted">Browse subscriptions and recent events. Click an event to see delivery attempts.</p>
+
+<h2>Subscriptions</h2>
+<table>
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>Filter</th>
+      <th>Status</th>
+      <th>Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for sub in subscriptions %}
+    <tr>
+      <td><code>{{ sub.url }}</code></td>
+      <td><code>{{ sub.event_filter }}</code></td>
+      <td>{% if sub.active %}Active{% else %}Inactive{% endif %}</td>
+      <td>{{ sub.created_at }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" class="muted">No subscriptions yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Recent Events</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Event ID</th>
+      <th>Created</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in events %}
+    <tr>
+      <td><code>{{ event.type }}</code></td>
+      <td><code>{{ event.id }}</code></td>
+      <td>{{ event.created_at }}</td>
+      <td><a href="/events/{{ event.id }}">View deliveries →</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" class="muted">No events yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

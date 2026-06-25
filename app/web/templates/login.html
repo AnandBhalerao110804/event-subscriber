@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Webhook Dashboard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f6f8fa; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .card { background: #fff; border: 1px solid #d0d7de; border-radius: 8px; padding: 2rem; width: 320px; }
+    h1 { font-size: 1.25rem; margin-top: 0; }
+    label { display: block; margin-bottom: 0.35rem; font-size: 0.9rem; }
+    input { width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid #d0d7de; border-radius: 6px; box-sizing: border-box; }
+    button { width: 100%; background: #0969da; color: #fff; border: none; padding: 0.6rem; border-radius: 6px; cursor: pointer; }
+    .error { color: #cf222e; margin-bottom: 1rem; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Admin Login</h1>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <form method="post" action="/login">
+      <label for="admin_key">Admin API Key</label>
+      <input type="password" id="admin_key" name="admin_key" required autofocus>
+      <button type="submit">Sign in</button>
+    </form>
+  </div>
+</body>
+</html>

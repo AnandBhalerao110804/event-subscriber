@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% macro status_badge(status) %}
+<span class="badge badge-{{ status }}">{{ status }}</span>
+{% endmacro %}
+
+{% block title %}Event {{ event.id }} — Webhook Service{% endblock %}
+
+{% block content %}
+<p><a href="/">← Back to dashboard</a></p>
+
+<div class="card">
+  <h1>Event <code>{{ event.id }}</code></h1>
+  <p><strong>Type:</strong> <code>{{ event.type }}</code></p>
+  <p><strong>Created:</strong> {{ event.created_at }}</p>
+  <p><strong>Payload:</strong></p>
+  <pre>{{ event.payload | tojson(indent=2) }}</pre>
+</div>
+
+<h2>Deliveries</h2>
+{% for delivery in event.deliveries %}
+<div class="card">
+  <p>
+    <strong>Subscription:</strong> <code>{{ delivery.subscription_url }}</code><br>
+    <strong>Delivery ID:</strong> <code>{{ delivery.id }}</code><br>
+    <strong>Status:</strong> {{ status_badge(delivery.status) }}
+    &nbsp; <strong>Attempts:</strong> {{ delivery.attempt_count }}
+    {% if delivery.attempts %}
+    <span class="muted">({{ delivery.attempts | length }} logged)</span>
+    {% endif %}
+    {% if delivery.last_status_code is not none %}
+    &nbsp; <strong>Last HTTP:</strong> {{ delivery.last_status_code }}
+    {% endif %}
+    {% if delivery.last_error %}
+    &nbsp; <strong>Error:</strong> {{ delivery.last_error }}
+    {% endif %}
+  </p>
+
+  {% if delivery.status in ['failed', 'dead'] %}
+  <form class="inline" method="post" action="/deliveries/{{ delivery.id }}/retry">
+    <button class="btn" type="submit">Retry delivery</button>
+  </form>
+  {% endif %}
+
+  <h3>Attempt history</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>HTTP</th>
+        <th>Duration</th>
+        <th>Error</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for attempt in delivery.attempts %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ attempt.status_code if attempt.status_code is not none else '—' }}</td>
+        <td>{{ attempt.duration_ms if attempt.duration_ms is not none else '—' }} ms</td>
+        <td>{{ attempt.error or '—' }}</td>
+        <td>{{ attempt.created_at }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="muted">No attempts recorded yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="muted">No deliveries for this event.</p>
+{% endfor %}
+{% endblock %}

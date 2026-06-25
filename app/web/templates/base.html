@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Webhook Dashboard{% endblock %}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #f6f8fa; color: #1f2328; }
+    header { background: #24292f; color: #fff; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    header a { color: #fff; text-decoration: none; margin-left: 1rem; }
+    main { max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; }
+    h1, h2 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d0d7de; margin-bottom: 1.5rem; }
+    th, td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #d0d7de; text-align: left; vertical-align: top; }
+    th { background: #f6f8fa; font-size: 0.85rem; }
+    tr:last-child td { border-bottom: none; }
+    code, pre { background: #f6f8fa; padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.9rem; }
+    pre { padding: 0.75rem; overflow-x: auto; }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+    .badge-pending { background: #fff8c5; color: #7d4e00; }
+    .badge-delivering { background: #ddf4ff; color: #0550ae; }
+    .badge-delivered { background: #dafbe1; color: #116329; }
+    .badge-failed { background: #ffebe9; color: #82071e; }
+    .badge-dead { background: #eaeef2; color: #57606a; }
+    .btn { background: #0969da; color: #fff; border: none; padding: 0.4rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+    .btn-secondary { background: #f6f8fa; color: #1f2328; border: 1px solid #d0d7de; }
+    .card { background: #fff; border: 1px solid #d0d7de; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    .muted { color: #57606a; font-size: 0.9rem; }
+    .error { color: #cf222e; margin-bottom: 1rem; }
+    form.inline { display: inline; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>Webhook Delivery Service</strong>
+    <nav>
+      <a href="/">Dashboard</a>
+      <a href="/docs">API Docs</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
