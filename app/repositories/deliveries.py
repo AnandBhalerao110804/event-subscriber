@@ -186,16 +186,8 @@ def retry_delivery(delivery_id: str) -> bool:
             """,
             (now, now, delivery_id),
         )
-        if cursor.rowcount == 0:
-            conn.commit()
-            return False
-
-        conn.execute(
-            "DELETE FROM delivery_attempts WHERE delivery_id = ?",
-            (delivery_id,),
-        )
         conn.commit()
-        return True
+        return cursor.rowcount > 0
 
 
 def get_delivery(delivery_id: str) -> dict | None:
