@@ -1,8 +1,5 @@
 {% extends "base.html" %}
-
-{% macro status_badge(status) %}
-<span class="badge badge-{{ status }}">{{ status }}</span>
-{% endmacro %}
+{% import "macros.html" as ui %}
 
 {% block title %}Event {{ event.id }} — Webhook Service{% endblock %}
 
@@ -23,7 +20,7 @@
   <p>
     <strong>Subscription:</strong> <code>{{ delivery.subscription_url }}</code><br>
     <strong>Delivery ID:</strong> <code>{{ delivery.id }}</code><br>
-    <strong>Status:</strong> {{ status_badge(delivery.status) }}
+    <strong>Status:</strong> {{ ui.status_badge(delivery.status) }}
     &nbsp; <strong>Total attempts:</strong> {{ delivery.attempts | length }}
     &nbsp; <strong>Auto retries this cycle:</strong> {{ delivery.attempt_count }}
     {% if delivery.last_status_code is not none %}

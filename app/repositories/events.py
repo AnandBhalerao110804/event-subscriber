@@ -1,6 +1,7 @@
 import json
 
 from app.db import get_connection
+from app.delivery_summary import summarize_delivery_statuses
 from app.matcher import matches_filter
 from app.repositories import deliveries as delivery_repo
 from app.repositories import subscriptions as subscription_repo
@@ -79,6 +80,44 @@ def list_events(limit: int = 50) -> list[dict]:
             (limit,),
         ).fetchall()
     return [_event_row_to_dict(row) for row in rows]
+
+
+def list_events_with_summary(limit: int = 50) -> list[dict]:
+    with get_connection() as conn:
+        event_rows = conn.execute(
+            """
+            SELECT * FROM events
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+        if not event_rows:
+            return []
+
+        event_ids = [row["id"] for row in event_rows]
+        placeholders = ",".join("?" for _ in event_ids)
+        delivery_rows = conn.execute(
+            f"""
+            SELECT event_id, status
+            FROM deliveries
+            WHERE event_id IN ({placeholders})
+            """,
+            event_ids,
+        ).fetchall()
+
+    statuses_by_event: dict[str, list[str]] = {event_id: [] for event_id in event_ids}
+    for row in delivery_rows:
+        statuses_by_event[row["event_id"]].append(row["status"])
+
+    events = []
+    for row in event_rows:
+        event = _event_row_to_dict(row)
+        delivery_statuses = statuses_by_event[event["id"]]
+        event["delivery_count"] = len(delivery_statuses)
+        event["delivery_summary"] = summarize_delivery_statuses(delivery_statuses)
+        events.append(event)
+    return events
 
 
 def get_event_with_deliveries(event_id: str) -> dict | None:

@@ -62,7 +62,7 @@ def dashboard_home(
         "index.html",
         {
             "subscriptions": subscription_repo.list_subscriptions(include_inactive=True),
-            "events": event_repo.list_events(limit=50),
+            "events": event_repo.list_events_with_summary(limit=50),
         },
     )
 

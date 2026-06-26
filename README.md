@@ -15,15 +15,26 @@ Verify the service is running:
 curl http://localhost:8000/health
 ```
 
-SQLite data is stored in a Docker volume (`webhook-data`) so it survives container restarts.
+SQLite data is stored in `./data/webhooks.db` on your machine. Docker bind-mounts that folder, so **Docker and local uvicorn share the same database**.
+
+> If you previously used the old `webhook-data` Docker volume, that data is separate. Copy it out or re-ingest; you can remove the unused volume with `docker volume rm assignment_webhook-data` (name may vary — check `docker volume ls`).
 
 ### Local development with hot reload
+
+Docker Compose uses two files:
+
+| File | Role |
+|------|------|
+| `docker-compose.yml` | Base setup: build image, port 8000, `.env`, shared `./data` volume |
+| `docker-compose.dev.yml` | Dev overrides: Uvicorn `--reload` + bind-mount `app/` for live code edits |
+
+Compose merges them when you pass both `-f` flags — you get the base service plus dev-only changes without duplicating the whole file.
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
-This bind-mounts `app/` and runs Uvicorn with `--reload`.
+This bind-mounts `app/` (code hot reload) and `data/` (same DB as local uvicorn).
 
 ## Quick start (without Docker)
 
@@ -129,6 +140,8 @@ The dashboard lets you:
 - Manually retry failed or dead deliveries
 
 Interactive API docs: http://localhost:8000/docs
+
+In Swagger UI, click **Authorize**, enter your `ADMIN_API_KEY` (e.g. `dev-admin-key`), then try endpoints. Postman and curl still use `Authorization: Bearer <ADMIN_API_KEY>` unchanged.
 
 ## Running tests
 
