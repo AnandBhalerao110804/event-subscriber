@@ -4,8 +4,10 @@ import json
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from pydantic import ValidationError
 
 from app.config import settings
+from app.models import SubscriptionCreate
 from app.repositories import deliveries as delivery_repo
 from app.repositories import events as event_repo
 from app.repositories import subscriptions as subscription_repo
@@ -18,6 +20,20 @@ templates.env.filters["tojson"] = lambda value, indent=None: json.dumps(
 )
 
 router = APIRouter(tags=["dashboard"])
+
+DEFAULT_FORM_VALUES = {"url": "", "event_filter": "*", "secret": ""}
+
+
+def _dashboard_context(
+    form_error: str | None = None,
+    form_values: dict | None = None,
+) -> dict:
+    return {
+        "subscriptions": subscription_repo.list_subscriptions(include_inactive=True),
+        "events": event_repo.list_events_with_summary(limit=50),
+        "form_error": form_error,
+        "form_values": form_values or DEFAULT_FORM_VALUES,
+    }
 
 
 @router.get("/login")
@@ -60,11 +76,45 @@ def dashboard_home(
     return templates.TemplateResponse(
         request,
         "index.html",
-        {
-            "subscriptions": subscription_repo.list_subscriptions(include_inactive=True),
-            "events": event_repo.list_events_with_summary(limit=50),
-        },
+        _dashboard_context(),
     )
+
+
+@router.post("/subscriptions")
+def create_subscription_from_dashboard(
+    request: Request,
+    url: str = Form(...),
+    event_filter: str = Form(...),
+    secret: str = Form(""),
+    auth_redirect: RedirectResponse | None = Depends(check_dashboard_auth),
+):
+    if auth_redirect:
+        return auth_redirect
+
+    form_values = {"url": url, "event_filter": event_filter, "secret": secret}
+    try:
+        body = SubscriptionCreate(
+            url=url,
+            event_filter=event_filter,
+            secret=secret or None,
+        )
+    except ValidationError:
+        return templates.TemplateResponse(
+            request,
+            "index.html",
+            _dashboard_context(
+                form_error="Invalid URL or event filter. URL must be http(s); filter cannot be empty.",
+                form_values=form_values,
+            ),
+            status_code=400,
+        )
+
+    subscription_repo.create_subscription(
+        url=str(body.url),
+        event_filter=body.event_filter,
+        secret=body.secret,
+    )
+    return RedirectResponse(url="/", status_code=303)
 
 
 @router.get("/events/{event_id}")

@@ -135,6 +135,7 @@ curl -X POST http://localhost:8000/api/subscriptions \
 Open http://localhost:8000 and sign in with your `ADMIN_API_KEY` (default: `dev-admin-key`).
 
 The dashboard lets you:
+- Create subscriptions (URL, event filter, optional secret)
 - List subscriptions and recent events
 - Drill into an event to see deliveries and attempt history
 - Manually retry failed or dead deliveries
@@ -161,7 +162,7 @@ docker compose run --rm webhook-service pytest
 
 - No rate limiting per subscription (a down endpoint can be retried indefinitely via manual retry)
 - No cap on manual retries (operators can re-queue `dead` deliveries without limit)
-- Subscription management is API-only (no create form in the dashboard)
+- Event ingest is API-only (no form in the dashboard)
 - Single shared admin key (by design per assignment — not real auth)
 
 ## What I'd improve with more time

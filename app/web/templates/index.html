@@ -7,7 +7,39 @@
 <h1>Dashboard</h1>
 <p class="muted">Browse subscriptions and recent events. Click an event to see delivery attempts.</p>
 
-<h2>Subscriptions</h2>
+<div class="section-header">
+  <h2>Subscriptions</h2>
+  <button class="btn" type="button" id="open-add-subscription">Add subscription</button>
+</div>
+
+<dialog class="modal" id="add-subscription-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>Add subscription</h3>
+      <button class="modal-close" type="button" id="close-add-subscription" aria-label="Close">&times;</button>
+    </div>
+    {% if form_error %}<p class="error">{{ form_error }}</p>{% endif %}
+    <form class="form-grid" method="post" action="/subscriptions">
+      <div class="form-row">
+        <label for="url">Target URL</label>
+        <input type="url" id="url" name="url" required placeholder="https://httpbin.org/post" value="{{ form_values.url }}">
+      </div>
+      <div class="form-row">
+        <label for="event_filter">Event filter</label>
+        <input type="text" id="event_filter" name="event_filter" required placeholder="order.*" value="{{ form_values.event_filter }}">
+      </div>
+      <div class="form-row">
+        <label for="secret">Secret <span class="muted">(optional)</span></label>
+        <input type="text" id="secret" name="secret" placeholder="shared-signing-secret" value="{{ form_values.secret }}">
+      </div>
+      <div class="modal-actions">
+        <button class="btn" type="submit">Create subscription</button>
+        <button class="btn btn-secondary" type="button" id="cancel-add-subscription">Cancel</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
 <table>
   <thead>
     <tr>
@@ -61,4 +93,29 @@
     {% endfor %}
   </tbody>
 </table>
+
+<script>
+  (function () {
+    const modal = document.getElementById("add-subscription-modal");
+    const openBtn = document.getElementById("open-add-subscription");
+    const closeBtn = document.getElementById("close-add-subscription");
+    const cancelBtn = document.getElementById("cancel-add-subscription");
+
+    function openModal() {
+      modal.showModal();
+    }
+
+    function closeModal() {
+      modal.close();
+    }
+
+    openBtn.addEventListener("click", openModal);
+    closeBtn.addEventListener("click", closeModal);
+    cancelBtn.addEventListener("click", closeModal);
+
+    {% if form_error %}
+    openModal();
+    {% endif %}
+  })();
+</script>
 {% endblock %}
