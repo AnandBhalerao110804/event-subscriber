@@ -34,8 +34,8 @@
 
 ## Dashboard scope
 
-**Choice:** Minimal Jinja2 UI — admin key login (cookie), home page listing subscriptions and recent events, event detail page showing deliveries and attempt history with a manual retry button. Subscription creation is API-only.
+**Choice:** Minimal Jinja2 UI — admin key login (cookie), home page with a form to create subscriptions plus tables for subscriptions and recent events, event detail page showing deliveries and attempt history with a manual retry button.
 
 **Alternatives considered:** React SPA; full CRUD in the UI; real authentication.
 
-**Why:** The assignment says a table view and detail view is enough. Cookie auth reuses the same admin key as the API. Keeping the UI read-heavy plus retry avoids scope creep; subscription management via curl or `/docs` is acceptable for the time box.
+**Why:** The assignment says a table view and detail view is enough. Cookie auth reuses the same admin key as the API. A create form on the dashboard makes the happy-path demo self-contained; event ingest stays API-only to avoid duplicating too much UI.
